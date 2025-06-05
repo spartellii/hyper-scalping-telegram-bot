@@ -52,9 +52,15 @@ def detect_liquidity_spike(df):
     signal = (wick > body * wick_threshold)
     return signal.iloc[-1]
 
-def main():
-    coin_list = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "OPUSDT", "DOGEUSDT", "RNDRUSDT"]
+coin_list = [
+    "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT", "ADAUSDT", "AVAXUSDT", "DOTUSDT", "SHIBUSDT",
+    "LINKUSDT", "MATICUSDT", "OPUSDT", "ARBUSDT", "INJUSDT", "APTUSDT", "ATOMUSDT", "LTCUSDT", "PEPEUSDT", "RNDRUSDT",
+    "SEIUSDT", "WIFUSDT", "TIAUSDT", "NEARUSDT", "SUIUSDT", "JUPUSDT", "BONKUSDT", "FTMUSDT", "TRXUSDT", "1000SATSUSDT",
+    "PYTHUSDT", "STXUSDT", "COTIUSDT", "GALAUSDT", "IMXUSDT", "FETUSDT", "AGIXUSDT", "ROSEUSDT", "RUNEUSDT", "AAVEUSDT",
+    "DYDXUSDT", "BLURUSDT", "LDOUSDT", "CKBUSDT", "GMXUSDT", "TWTUSDT", "DYMUSDT", "SKLUSDT", "ONEUSDT", "ENJUSDT"
+]
 
+def main():
     while True:
         for coin in coin_list:
             try:
@@ -62,20 +68,19 @@ def main():
                 df_15m = get_klines(coin, interval="15m", limit=100)
 
                 trend = get_trend(df_15m)
-
                 macd_ok = macd_signal(df_3m)
                 rsi = rsi_signal(df_3m)
                 atr = atr_signal(df_3m)
                 liq = detect_liquidity_spike(df_3m)
 
                 if trend == "BULL" and macd_ok and rsi < 35 and liq:
-                    send_message(f"📈 BUY sinyali ({coin}) - RSI: {int(rsi)}, ATR: {atr:.2f}")
+                    send_message(f"📈 BUY sinyali - {coin}\nRSI: {int(rsi)} | ATR: {atr:.2f}")
                 elif trend == "BEAR" and not macd_ok and rsi > 70 and liq:
-                    send_message(f"📉 SELL sinyali ({coin}) - RSI: {int(rsi)}, ATR: {atr:.2f}")
+                    send_message(f"📉 SELL sinyali - {coin}\nRSI: {int(rsi)} | ATR: {atr:.2f}")
 
-                time.sleep(2)
+                time.sleep(1)
             except Exception as e:
                 print(f"{coin} - Hata: {e}")
                 continue
 
-        time.sleep(180)  # 3 dakikada bir
+        time.sleep(300)  # 5 dakika bekle
